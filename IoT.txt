@@ -1,0 +1,112 @@
+﻿free c.
+
+private free cv.
+free t1,t2,t3.
+free p1,p2,p3.
+
+fun f1/4.
+private fun f2/1.
+private reduc f3(x1,x2,x3,f2(f1))=f1(x1,x2,x3,x4).
+
+
+fun encrypt/2.
+reduc decrypt(encrypt(x,y),y)=x.
+
+
+fun h/2.
+
+
+
+query attacker(skRA);
+query attacker(sku);
+
+
+query attacker(IDi);
+
+
+
+
+query event RAauthenticated(sku)=>RAauthentication(skRA) .
+query event userauthenticated(skRA)=> userauthentication(sku).
+
+
+
+
+let User=
+(*Registration*)
+in(cv,(ID,PW));
+new N1;
+let MID=h(ID,N1) in
+let MPW=h(PW,N1) in
+out(cv,(MID,MPW));
+(* Authentication *)
+new s;
+out(c,(s,MID));
+in(c,(s,Ri));
+
+new ra;
+let fx=f1(p1,p2,p3,h(MPW,Ri)) in
+let AUTN1=h4(s,mult(ra,P),MID,fx) in
+event Userauthentication(sku);
+out(c,(s,MID,mult(ra,P),AUTN1));
+
+in(c,(AUTN2,mult(rb,p)));
+if AUTN2=h4(mult(ra,P),mult(Rb,P),mult(ra,mult(rb,p)),fx) then
+let SKu=h4(mult(ra,P),mult(Rb,P),mult(ra,mult(rb,p)),fx) then
+event RAauthenticated(SKu).
+
+
+let Thing1=
+in(c,(s,mid));
+out(c,(s,mid,p1));
+
+
+let Thing2=
+in(c,(s,mid));
+out(c,(s,mid,p2));
+
+
+
+let Thing3=
+in(c,(s,mid));
+out(c,(s,mid,p3));
+
+let RA=
+
+in(c,(s,mid,p1));
+in(c,(s,mid,p2));
+in(c,(s,mid,p3));
+
+
+out(c,(s,mid,p1,p2,p3));
+in(c,encrypted);
+let (s,pr)= decrypt(encrypted,k) in
+
+in(c,(s,MID,mult(ra,P),AUTN));
+
+let fx=f3(p1,p2,p3,pr) in
+if AUTN1=h4(s,mult(ra,P),MID,fx) then
+let skRA=h4(mult(ra,P),mult(Rb,P),mult(ra,mult(rb,p)),fx) in
+event userauthenticated(skRA);
+new Rb;
+let AUTN2=h4(mult(ra,P),mult(Rb,P),mult(ra,mult(rb,p)),fx) in
+event RAauthentication(skRA);
+out(c,(AUTN2,mult(rb,p))).
+
+
+let Server=
+in(cv,(MID,MPW));
+in(c,(s,mid,p1,p2,p3));
+if mid=MID then
+new Ri;
+let fx=f1(p1,p2,p3,h(MPW,Ri)) in
+out(c,(s,Ri));
+let pr=f2(fx) in
+out(c,encrypt((s,pr),k)).
+
+process 
+new k;
+(!(User)|!(Thing1)|!(Thing2)|!(Thing3)|!(Server)|!(RA))
+
+
+
